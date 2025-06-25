@@ -1,4 +1,4 @@
-package com.codegym.model;
+package com.codegym.musicapp.model;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;

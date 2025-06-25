@@ -1,5 +1,6 @@
-package com.codegym;
+package com.codegym.musicapp.controller;
 
+import com.codegym.musicapp.repository.SongRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -17,13 +18,13 @@ public class SongController {
     // Display form to add new song
     @GetMapping("/new")
     public String showAddForm(Model model) {
-        model.addAttribute("song", new Song());
+        model.addAttribute("song", new com.codegym.musicapp.model.Song());
         return "song-form";
     }
 
     // Handle form submission for adding new song
     @PostMapping
-    public String addSong(@Valid @ModelAttribute Song song, BindingResult result) {
+    public String addSong(@Valid @ModelAttribute com.codegym.musicapp.model.Song song, BindingResult result) {
         if (result.hasErrors()) {
             return "song-form";
         }
@@ -34,7 +35,7 @@ public class SongController {
     // Display form to edit song
     @GetMapping("/edit/{id}")
     public String showEditForm(@PathVariable Long id, Model model) {
-        Song song = songRepository.findById(id)
+        com.codegym.musicapp.model.Song song = songRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Invalid song Id:" + id));
         model.addAttribute("song", song);
         return "song-form";
@@ -42,7 +43,7 @@ public class SongController {
 
     // Handle form submission for updating song
     @PostMapping("/update/{id}")
-    public String updateSong(@PathVariable Long id, @Valid @ModelAttribute Song song,
+    public String updateSong(@PathVariable Long id, @Valid @ModelAttribute com.codegym.musicapp.model.Song song,
                              BindingResult result) {
         if (result.hasErrors()) {
             song.setId(id);

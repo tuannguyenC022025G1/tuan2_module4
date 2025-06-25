@@ -1,4 +1,4 @@
-package com.codegym;
+package com.codegym.musicapp;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
