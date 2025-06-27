@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <title>Category Management</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f7f9;
+            margin: 20px;
+            color: #333;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: auto;
+            background: #fff;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 25px;
+        }
+
+        .create-link {
+            display: inline-block;
+            background: #28a745;
+            color: #fff;
+            padding: 10px 15px;
+            border-radius: 5px;
+            font-weight: bold;
+            margin-bottom: 20px;
+            text-decoration: none;
+        }
+
+        .create-link:hover {
+            background: #218838;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            padding: 12px;
+            border: 1px solid #ddd;
+            text-align: left;
+        }
+
+        th {
+            background-color: #f8f9fa;
+        }
+
+        .actions a {
+            margin-right: 10px;
+            text-decoration: none;
+        }
+
+        .back-link {
+            display: block;
+            margin-top: 20px;
+            text-align: center;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1>Category List</h1>
+    <a href="/categories/create" class="create-link">➕ Create New Category</a>
+    <a href="/blogs" style="float: right; line-height: 40px;">← Back to Blog List</a>
+
+    <table>
+        <thead>
+        <tr>
+            <th>ID</th>
+            <th>Category Name</th>
+            <th>Created At</th>
+            <th style="width: 150px;">Actions</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="category : ${categories}">
+            <td th:text="${category.id}">1</td>
+            <td th:text="${category.name}">Technology</td>
+
+            <!-- ======================================================= -->
+            <!-- ===== SỬA LỖI HIỂN THỊ NGÀY GIỜ TẠI ĐÂY ===== -->
+            <td th:text="${category.createdAt != null} ? ${category.createdAt.format(T(java.time.format.DateTimeFormatter).ofPattern('dd/MM/yyyy HH:mm'))} : ''">01/01/2023</td>
+            <!-- ======================================================= -->
+
+            <td class="actions">
+                <a th:href="@{'/categories/edit/' + ${category.id}}">✏️ Edit</a>
+                <a th:href="@{'/categories/delete/' + ${category.id}}">🗑️ Delete</a>
+            </td>
+        </tr>
+        <tr th:if="${#lists.isEmpty(categories)}">
+            <td colspan="4" style="text-align: center; font-style: italic;">No categories found.</td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+</body>
+</html>

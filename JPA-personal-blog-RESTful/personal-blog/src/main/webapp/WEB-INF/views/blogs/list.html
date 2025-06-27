@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <title>Blog List</title>
+    <style>
+        /* CSS gốc của bạn được giữ nguyên */
+        body {
+            font-family: Arial, sans-serif;
+            background: #f7f7f7;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 50px auto;
+            background: #fff;
+            padding: 25px 30px;
+            border-radius: 8px;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 25px;
+        }
+
+        a {
+            text-decoration: none;
+            color: #007bff;
+            font-weight: 600;
+            transition: color 0.3s ease;
+        }
+
+        a:hover {
+            color: #0056b3;
+        }
+
+        p a.create-link {
+            font-size: 1.1rem;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+
+        table, th, td {
+            border: 1px solid #ddd;
+        }
+
+        th, td {
+            padding: 12px 15px;
+            text-align: left;
+            color: #444;
+        }
+
+        th {
+            background-color: #f0f0f0;
+            font-weight: 700;
+        }
+
+        tbody tr:hover {
+            background-color: #f9f9f9;
+        }
+
+        td a {
+            margin-right: 8px;
+        }
+
+        /* CSS thêm mới */
+        .controls-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .search-form {
+            display: flex;
+            flex-grow: 1;
+        }
+
+        .search-form input {
+            flex-grow: 1;
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 4px 0 0 4px;
+        }
+
+        .search-form button {
+            padding: 8px 12px;
+            border: none;
+            background: #007bff;
+            color: white;
+            border-radius: 0 4px 4px 0;
+            cursor: pointer;
+        }
+
+        .manage-category-button {
+            background-color: #6c757d;
+            color: white;
+            padding: 9px 15px;
+            border-radius: 4px;
+            font-size: 0.9rem;
+            font-weight: bold;
+        }
+
+        .manage-category-button:hover {
+            background-color: #5a6268;
+            color: white;
+        }
+
+        .pagination {
+            text-align: center;
+            margin-top: 25px;
+        }
+
+        .pagination a, .pagination span {
+            margin: 0 4px;
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+
+        .pagination a.active {
+            background: #007bff;
+            color: #fff;
+            border-color: #007bff;
+        }
+
+        .pagination span {
+            color: #aaa;
+            border-color: #eee;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>All Blogs</h1>
+
+    <div class="controls-bar">
+        <a href="/categories" class="manage-category-button">⚙️ Manage Categories</a>
+        <form th:action="@{/blogs}" method="get" class="search-form">
+            <input type="text" name="keyword" th:value="${keyword}" placeholder="Search by title..."/>
+            <button type="submit">Search</button>
+        </form>
+    </div>
+
+    <p>
+        <a href="/blogs/create" class="create-link">➕ Create New Blog</a>
+    </p>
+
+    <table>
+        <thead>
+        <tr>
+            <th>Title</th>
+            <th>Author</th>
+            <th>Category</th>
+            <th>Created At</th>
+            <th>Actions</th>
+        </tr>
+        </thead>
+        <tbody>
+        <!-- Dùng logic phân trang nhưng cú pháp hiển thị là của bạn -->
+        <tr th:each="blog : ${blogs.content}">
+            <td th:text="${blog.title}">Blog Title</td>
+            <td th:text="${blog.author}">Author</td>
+            <td th:text="${blog.category?.name} ?: 'N/A'">Category Name</td>
+
+            <!-- ======================================================= -->
+            <!-- ===== SỬ DỤNG LẠI CHÍNH XÁC CÚ PHÁP CŨ CỦA BẠN ===== -->
+            <td th:text="${blog.createdAt != null} ? ${blog.createdAt.format(T(java.time.format.DateTimeFormatter).ofPattern('dd/MM/yyyy HH:mm'))} : ''">
+                01/01/2023 10:00
+            </td>
+            <td>
+                <a th:href="@{'/blogs/view/' + ${blog.id}}">👁 View</a> |
+                <a th:href="@{'/blogs/edit/' + ${blog.id}}">✏ Edit</a> |
+                <a th:href="@{'/blogs/delete/' + ${blog.id}}">🗑 Delete</a>
+            </td>
+            <!-- ======================================================= -->
+
+        </tr>
+        <tr th:if="${blogs.content.isEmpty()}">
+            <td colspan="5" style="text-align:center; font-style: italic;">No blogs found.</td>
+        </tr>
+        </tbody>
+    </table>
+
+    <div class="pagination" th:if="${blogs.totalPages > 1}">
+        <a th:if="${blogs.hasPrevious()}" th:href="@{/blogs(page=${blogs.number - 1}, keyword=${keyword})}">«
+            Previous</a>
+        <span th:unless="${blogs.hasPrevious()}">« Previous</span>
+        <th:block th:each="i : ${#numbers.sequence(0, blogs.totalPages - 1)}">
+            <a th:if="${i >= blogs.number - 2 and i <= blogs.number + 2}"
+               th:href="@{/blogs(page=${i}, keyword=${keyword})}" th:text="${i + 1}"
+               th:classappend="${i == blogs.number} ? 'active'"></a>
+        </th:block>
+        <a th:if="${blogs.hasNext()}" th:href="@{/blogs(page=${blogs.number + 1}, keyword=${keyword})}">Next »</a>
+        <span th:unless="${blogs.hasNext()}">Next »</span>
+    </div>
+
+</div>
+
+</body>
+</html>
